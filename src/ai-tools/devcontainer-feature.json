@@ -1,0 +1,17 @@
+{
+    "id": "ai-tools",
+    "version": "1.0.0",
+    "name": "AI Development Tools",
+    "description": "Standard AI coding tools, starting with Claude Code",
+    "documentationURL": "https://github.com/lucassoumaille/devcontainer-features",
+    "dependsOn": {
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "anthropic.claude-code"
+            ]
+        }
+    }
+}
