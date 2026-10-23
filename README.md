@@ -1,151 +1,65 @@
 # Dev Container Features
 
-Reusable Dev Container Features for a consistent, secure, AI-assisted development environment.
+Reusable Dev Container Features shared by the language templates in [devcontainer-templates](https://github.com/lucassoumaille/devcontainer-templates).
 
-This repository contains shared development tooling designed to be reused across language-specific Dev Container templates.
-
-## Available Features
-
-### `ai-tools`
-
-**Status:** Initial version — Claude Code
-
-The `ai-tools` Feature provides a common entry point for AI coding tools across development environments.
-
-Current capabilities:
-
-- Installs Claude Code through the official Anthropic Dev Container Feature.
-- Adds the Claude Code extension to VS Code.
-- Provides a foundation for integrating additional AI development tools.
-
-The Feature delegates Claude Code installation to Anthropic rather than maintaining a separate installation mechanism.
-
-### Usage
-
-Add the Feature to your `.devcontainer/devcontainer.json`:
+## `ai-tools`
 
 ```json
 {
   "features": {
-    "ghcr.io/USER/devcontainer-features/ai-tools:1": {}
+    "ghcr.io/lucassoumaille/devcontainer-features/ai-tools:1": {}
   }
 }
 ```
 
-Replace `USER` with the GitHub account or organization that publishes this repository.
+| Option | Default | Description |
+|---|---|---|
+| `installOpenCode` | `true` | Install the OpenCode CLI with npm |
 
-The Feature must be published to GitHub Container Registry (GHCR) before this reference can be used.
+What the feature provides:
 
-## Claude Code Configuration Persistence
+- **Claude Code** through the official `ghcr.io/anthropics/devcontainer-features/claude-code` feature, plus the VS Code extension.
+- **One login for every container.** A named volume `claude-code-config` is mounted at `/mnt/claude-config` and `CLAUDE_CONFIG_DIR` points to it. Credentials, `.claude.json`, history and user settings are shared by every container that uses the feature. Log in once.
+- **Shared configuration**, versioned with the feature:
+  - `/etc/claude-code/managed-settings.d/ai-tools.json`: permission deny rules (managed settings, cannot be overridden by projects).
+  - `/etc/claude-code/CLAUDE.md`: language-agnostic instructions (security, approvals, reporting).
+  - Skills `quick-review` and `security-audit`, copied into `$CLAUDE_CONFIG_DIR/skills` on every container start.
+- **OpenCode** (optional), installed with npm.
 
-Claude Code configuration can be persisted between container rebuilds using a named Docker volume.
+Language- and project-specific instructions (`AGENTS.md`, `CLAUDE.md`, `.claude/rules/`) belong in the templates or in the projects themselves.
 
-Add the following properties to your `.devcontainer/devcontainer.json`:
+### Requirements
 
-```json
-{
-  "mounts": [
-    "source=claude-code-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
-  ],
-  "containerEnv": {
-    "CLAUDE_CONFIG_DIR": "/home/vscode/.claude"
-  }
-}
-```
+- Add `ghcr.io/devcontainers/features/node:2` (or use an image with Node.js). The Claude Code feature's own Node.js fallback no longer installs on current Debian/Ubuntu images.
+- Every container must run as a user with the same UID (1000 for `vscode` and `node` in the Microsoft base images); the volume is owned by that UID.
+- Do not declare another mount or `CLAUDE_CONFIG_DIR` in `devcontainer.json`: values there override the feature's.
 
-Merge these properties into your existing configuration rather than duplicating JSON keys.
+### Security notes
 
-### How it works
+- Every container using the feature can read your Claude credentials. Do not use it to open untrusted code you would not run on your host.
+- Never commit API keys or tokens, and never bake credentials into images.
+- `docker volume rm claude-code-config` logs you out everywhere.
 
-- The named volume stores Claude's configuration outside the container's writable filesystem.
-- Rebuilding the same Dev Container can reuse the volume.
-- Different Dev Containers receive separate volumes when their `devcontainerId` values differ.
-- Removing the volume also removes the configuration stored in it.
+### Migrating from per-container volumes
 
-On the first start, launch `claude` and complete authentication if prompted.
-
-**Security notes**
-
-- Never commit API keys, authentication tokens, or other credentials.
-- Do not bake personal credentials into Docker images.
-- Protect access to the Docker daemon and persistent configuration volumes.
-- Authentication may need to be renewed when a session expires.
-
-## Repository Structure
-
-```text
-devcontainer-features/
-├── .devcontainer/
-├── .github/
-│   └── workflows/
-├── src/
-│   └── ai-tools/
-│       ├── devcontainer-feature.json
-│       └── install.sh
-├── test/
-│   └── ai-tools/
-│       └── test.sh
-├── LICENSE
-└── README.md
-```
-
-- `src/ai-tools/` contains the Feature definition and installation script.
-- `test/ai-tools/` contains the installation smoke test.
-- `.github/workflows/` contains repository automation for validation and publication.
-
-## Development and Testing
-
-Requirements:
-
-- Docker
-- Node.js, as required by the Dev Container CLI
-- [Dev Container CLI](https://github.com/devcontainers/cli)
-
-Run the Feature tests from the repository root:
+Earlier versions mounted `claude-code-config-${devcontainerId}`. To reuse an existing login instead of logging in again:
 
 ```bash
-devcontainer features test \
-  --project-folder . \
-  --features ai-tools
+docker volume ls --filter name=claude-code-config-
+docker run --rm -v <old-volume>:/from -v claude-code-config:/to alpine sh -c 'cp -a /from/. /to/'
 ```
 
-The test verifies that Claude Code is installed and that its CLI is available.
+## Development
 
-The test does not authenticate with Anthropic or verify a live Claude session.
+```bash
+devcontainer features test --features ai-tools --skip-autogenerated .
+```
+
+The scenarios in `test/ai-tools/scenarios.json` add the `node` feature and run as `vscode`. They check that Claude Code and OpenCode are installed, that the shared config directory is writable, and that the managed config and skills are in place. It does not authenticate with Anthropic.
 
 ## Publishing
 
-Features are distributed as OCI artifacts through GitHub Container Registry.
-
-The intended published reference is:
-
-```text
-ghcr.io/TON_USER/devcontainer-features/ai-tools:1
-```
-
-Use the repository's GitHub Actions workflows to validate and publish the Feature. Confirm that the package exists in GHCR and that its visibility matches your intended use.
-
-When making a breaking change, consider publishing a new major version. For compatible changes, update the Feature version and follow the repository's release workflow.
-
-## Design Principles
-
-- **Reusable:** shared tools should be available across language-specific templates.
-- **Composable:** each Feature should have a focused responsibility.
-- **Reproducible:** installation and testing should be automated.
-- **Secure by default:** credentials should remain outside source control and container images.
-- **Maintainable:** prefer official upstream installation mechanisms where appropriate.
-
-## Roadmap
-
-Potential future additions:
-
-- OpenCode CLI integration.
-- OpenAI Codex CLI integration.
-- Shared developer tooling.
-- Optional security tooling.
-- Automated compatibility and release tests.
-
-These items are planned possibilities, not capabilities currently provided by `ai-tools`.
+Run the **Release** workflow on `main`. The feature is published to `ghcr.io/lucassoumaille/devcontainer-features/ai-tools`. Bump `version` in `devcontainer-feature.json` for each release (major for breaking changes).
 
 ## License
 

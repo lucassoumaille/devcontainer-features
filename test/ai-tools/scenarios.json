@@ -1,0 +1,24 @@
+{
+    "vscode_user": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "remoteUser": "vscode",
+        "features": {
+            "ghcr.io/devcontainers/features/node:2": {
+                "version": "22"
+            },
+            "ai-tools": {}
+        }
+    },
+    "without_opencode": {
+        "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+        "remoteUser": "vscode",
+        "features": {
+            "ghcr.io/devcontainers/features/node:2": {
+                "version": "22"
+            },
+            "ai-tools": {
+                "installOpenCode": false
+            }
+        }
+    }
+}
