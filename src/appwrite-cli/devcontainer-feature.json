@@ -1,0 +1,28 @@
+{
+    "id": "appwrite-cli",
+    "version": "1.0.0",
+    "name": "Appwrite CLI",
+    "description": "Appwrite CLI with its login kept across container rebuilds.",
+    "documentationURL": "https://github.com/lucassoumaille/devcontainer-features/tree/main/src/appwrite-cli",
+    "licenseURL": "https://github.com/lucassoumaille/devcontainer-features/blob/main/LICENSE",
+    "options": {
+        "version": {
+            "type": "string",
+            "proposals": [
+                "latest"
+            ],
+            "default": "latest",
+            "description": "Version of the appwrite-cli npm package to install."
+        }
+    },
+    "installsAfter": [
+        "ghcr.io/devcontainers/features/node"
+    ],
+    "mounts": [
+        {
+            "source": "appwrite-cli-config",
+            "target": "/mnt/appwrite-config",
+            "type": "volume"
+        }
+    ]
+}

@@ -1,5 +1,5 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/javascript-node:1-20-bookworm",
+    "image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
     "customizations": {
         "vscode": {
             "settings": {
@@ -18,7 +18,11 @@
         }
     },
     "features": {
-        "ghcr.io/devcontainers/features/docker-in-docker:2": {}
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {},
+        "ghcr.io/devcontainers/features/git:1": {},
+        "ghcr.io/lucassoumaille/devcontainer-features/ai-tools:1": {
+			"installOpenCode": false
+		}
     },
     "remoteUser": "node",
     "updateContentCommand": "npm install -g @devcontainers/cli"
