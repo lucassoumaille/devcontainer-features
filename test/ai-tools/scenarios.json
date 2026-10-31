@@ -2,6 +2,7 @@
     "vscode_user": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "remoteUser": "vscode",
+        "updateRemoteUserUID": false,
         "features": {
             "ghcr.io/devcontainers/features/node:2": {
                 "version": "22"
@@ -12,6 +13,7 @@
     "without_opencode": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "remoteUser": "vscode",
+        "updateRemoteUserUID": false,
         "features": {
             "ghcr.io/devcontainers/features/node:2": {
                 "version": "22"

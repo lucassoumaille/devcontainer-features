@@ -32,6 +32,7 @@ Language- and project-specific instructions (`AGENTS.md`, `CLAUDE.md`, `.claude/
 
 - Add `ghcr.io/devcontainers/features/node:2` (or use an image with Node.js). The Claude Code feature's own Node.js fallback no longer installs on current Debian/Ubuntu images.
 - Every container must run as a user with the same UID (1000 for `vscode` and `node` in the Microsoft base images); the volume is owned by that UID.
+- On a Linux host whose UID is not 1000, the Dev Containers CLI changes the remote user's UID to match and only re-owns the home folder, so the volume becomes unwritable. Set `"updateRemoteUserUID": false` in `devcontainer.json` (the test scenarios do, because GitHub runners use UID 1001).
 - Do not declare another mount or `CLAUDE_CONFIG_DIR` in `devcontainer.json`: values there override the feature's.
 
 ### Security notes
@@ -73,6 +74,7 @@ What the feature provides:
 
 - Add `ghcr.io/devcontainers/features/node:2` (or use an image with Node.js); the install fails without `npm`.
 - Every container must run as a user with the same UID (1000 for `vscode` and `node`); the volume is owned by that UID.
+- On a Linux host whose UID is not 1000, the Dev Containers CLI changes the remote user's UID to match and only re-owns the home folder, so the volume becomes unwritable. Set `"updateRemoteUserUID": false` in `devcontainer.json` (the test scenarios do, because GitHub runners use UID 1001).
 
 ### Security notes
 

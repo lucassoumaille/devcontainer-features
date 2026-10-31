@@ -2,6 +2,7 @@
     "node_image": {
         "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
         "remoteUser": "node",
+        "updateRemoteUserUID": false,
         "features": {
             "appwrite-cli": {}
         }
@@ -9,6 +10,7 @@
     "vscode_user": {
         "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
         "remoteUser": "vscode",
+        "updateRemoteUserUID": false,
         "features": {
             "ghcr.io/devcontainers/features/node:2": {
                 "version": "22"
@@ -19,6 +21,7 @@
     "pinned_version": {
         "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
         "remoteUser": "node",
+        "updateRemoteUserUID": false,
         "features": {
             "appwrite-cli": {
                 "version": "28.10.2"
